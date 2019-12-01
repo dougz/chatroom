@@ -1,0 +1,14 @@
+shortname: chatroom
+title: Chatroom
+answer: BAZOOKAS
+
+author:
+  - Jan Chonge
+
+oncall: dougz@isotropic.org
+puzzletron_id: -1
+
+obfuscate_assets: true
+
+for_ops_url: https://isotropic.org
+
