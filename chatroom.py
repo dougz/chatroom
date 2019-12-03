@@ -82,11 +82,6 @@ class TextTransform:
       return text
 
 
-# deploy.sh replaces the following comment with built-in credentials
-# when this is packaged for distribution.
-
-# CREDENTIALS HERE
-
 class Oauth2Token:
   def __init__(self, creds):
     self.private_key = serialization.load_pem_private_key(
@@ -117,16 +112,10 @@ class Oauth2Token:
       "exp": now + 3600,
       "iat": now,
     }
-
     cs = base64.urlsafe_b64encode(json.dumps(claims).encode("utf-8"))
-
     to_sign = h + b"." + cs
-
-    sig = self.private_key.sign(to_sign,
-                           padding.PKCS1v15(),
-                           hashes.SHA256())
+    sig = self.private_key.sign(to_sign, padding.PKCS1v15(), hashes.SHA256())
     sig = base64.urlsafe_b64encode(sig)
-
     jwt = to_sign + b"." + sig
 
     req = tornado.httpclient.HTTPRequest(
@@ -230,9 +219,6 @@ class SubmitHandler(tornado.web.RequestHandler):
 
 class DebugHandler(tornado.web.RequestHandler):
   async def get(self, fn):
-    print("testing translation...")
-    await test_translate(GameState.text_transform)
-    print("done")
     if fn.endswith(".css"):
       self.set_header("Content-Type", "text/css")
     elif fn.endswith(".js"):
@@ -244,6 +230,12 @@ class DebugHandler(tornado.web.RequestHandler):
 async def test_translate(text_transform):
   result = await text_transform.translate_to_french("hello, world")
   print(result)
+
+
+# deploy.sh replaces the following comment with built-in credentials
+# when this is packaged for distribution.
+
+# CREDENTIALS HERE
 
 
 def make_app(options):
