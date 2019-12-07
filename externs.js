@@ -12,10 +12,12 @@ class Message {
 	/** @type{string} */
 	this.method;
 	/** @type{string} */
-	this.text;
+	this.who;
 	/** @type{string} */
+	this.text;
+	/** @type{?string} */
 	this.alt;
-	/** @type{Array<number>} */
+	/** @type{?Array<number>} */
 	this.wids;
     }
 }

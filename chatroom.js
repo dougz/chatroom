@@ -24,14 +24,20 @@ class ChatroomDispatcher {
 	if (curr.length > 20) {
 	    goog.dom.removeNode(curr[0]);
 	}
-        var el;
-        if (msg.wids.includes(wid)) {
-            console.log("wid is", wid, "; using text");
-	    el = goog.dom.createDom("P", null, msg.text);
+
+        var text;
+        if (!msg.wids) {
+            text = msg.text;
         } else {
-            console.log("wid is", wid, "; using alt");
-	    el = goog.dom.createDom("P", null, msg.alt);
+            if (msg.wids.includes(wid)) {
+                text = msg.text;
+            } else {
+                text = msg.alt;
+            }
         }
+	var el = goog.dom.createDom("P", null,
+                                goog.dom.createDom("B", null, msg.who),
+                                ": ", text);
 	chatroom.chat.appendChild(el);
     }
 }

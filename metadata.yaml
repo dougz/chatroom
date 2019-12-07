@@ -1,5 +1,5 @@
 shortname: chatroom
-title: Chatroom
+title: Town Hall Meeting
 answer: BAZOOKAS
 
 author:
@@ -10,5 +10,5 @@ puzzletron_id: -1
 
 obfuscate_assets: true
 
-for_ops_url: https://isotropic.org
+for_ops_url: https://docs.google.com/document/d/1mCe_kUMXmowSjCHcaPhD3mBI_CQPd_7NREWz_jh8zPo/edit
 

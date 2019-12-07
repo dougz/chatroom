@@ -3,6 +3,7 @@
 import argparse
 import io
 import re
+import readline
 import os
 import enchant
 
@@ -54,6 +55,7 @@ class TextTransform:
 
 
       if (total < len(self.speaker2_dict) and total > 0):
+        print(total)
         # our index is 1 based
         out.append(self.speaker2_dict[total - 1])
 
@@ -80,7 +82,7 @@ class TextTransform:
         return self.translate_to_french(text)
   #      return await self.translate_to_french(text)
       elif speaker == 2:
-        # Index into the 
+        # Index into the
         return self.index_text(text)
       elif speaker == 3:
         # Reverse words
@@ -94,8 +96,8 @@ def main():
     description=("Test Crosschat speaker transforms"))
   parser.add_argument("--speaker", type=int, default=2, help="Which speaker to test (2, 3 or 4).")
   parser.add_argument("--input_file", default="declaration.txt",
-                      help="File source for speaker 2.")  
- 
+                      help="File source for speaker 2.")
+
   options = parser.parse_args()
 
   if options.input_file:
@@ -104,12 +106,13 @@ def main():
       user_input = ""
       while user_input != "_quit_":
         user_input = input("Enter input from speaker " + str(options.speaker) + " (\'_quit_\' to quit): ").strip()
+        if not user_input: break
 
         print("SPEAKER " + str(options.speaker) + ": " + transformer.transform(int(options.speaker), user_input))
 
       print("Goodbye!")
 
-  
+
 
 if __name__ == "__main__":
   main()
