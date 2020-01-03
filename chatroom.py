@@ -34,7 +34,6 @@ class TextTransform:
     self.declaration_index = [None]
     self.english = enchant.Dict("en_US")
     self.english.add("spam")
-    self.english.add("dit")
 
     self.alpha = {}
     for i, k in enumerate(string.ascii_lowercase):
@@ -49,20 +48,8 @@ class TextTransform:
         if self.declaration_index[-1] in ("friends", "with", "benefits"):
           print(len(self.declaration_index)-1, self.declaration_index[-1])
 
-
-  CHEATS = {
-    "sang cher": "chanté cher",
-    "sang Cher": "chanté Cher",
-    "Sang cher": "Chanté cher",
-    "Sang Cher": "Chanté Cher",
-    "SANG CHER": "CHANTÉ CHER",
-    "said gold dowry": "dit or dot",
-    }
-
   async def translate_to_french(self, text):
-    norm = " ".join(text.split())
-    result = self.CHEATS.get(norm)
-    if result: return result
+    norm = " ".join(text.split()).lower()
 
     d = {"q": text, "target": "fr", "format": "text"}
     for retry in range(2):
@@ -86,6 +73,7 @@ class TextTransform:
         return ""
 
     j = json.loads(response.body)
+    print(j)
     try:
       return j["data"]["translations"][0]["translatedText"]
     except (KeyError, IndexError):
@@ -106,7 +94,7 @@ class TextTransform:
           total += sum(self.alpha.get(k, 0) for k in w)
         else:
           print(f"{w} bad")
-          out.append(w)
+          out.append("*" * len(w))
       if 0 < total < len(self.declaration_index):
         out.append(self.declaration_index[total])
       print(f"sentence [{s}] total [{total}] out [{' '.join(out)}]")
@@ -397,13 +385,12 @@ def make_app(options):
          "THE ENGLISH PATIENT",
          "No idea what that means, but the Madame says that THE ENGLISH "
          "PATIENT is correct!"),
-    Clue("Over at the telegraph station, they’re startin’ to ask me some "
-         "questions I can’t answer. Says here, Morse code uses two "
-         "symbols. What might you call the round one if you had a couple "
-         "of options? [3 2 3]",
-         "DIT OR DOT",
-         "Yeah, now that you mention it, you could call it a DIT OR "
-         "DOT. Correct!"),
+    Clue("Miss Jenkins over at the General Store got a shipment of ladies "
+         "underthings last month, but they are not flying off the shelves the "
+         "way she had hoped.  She’s trying to clear inventory, so what we would "
+         "call what she is running now? [4 4]",
+         "BRAS SALE",
+         "Yeah, I guess we could say she was running a BRAS SALE. Correct!"),
     Clue("Sixth item. We got some rascals from the Cutler Gang messin’ "
          "up our dogs and cats, those no-good varmints. They done came "
          "into town and took a knife to poor Mr. Walter’s dog’s feet! "
