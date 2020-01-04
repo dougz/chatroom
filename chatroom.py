@@ -49,37 +49,49 @@ class TextTransform:
           print(len(self.declaration_index)-1, self.declaration_index[-1])
 
   async def translate_to_french(self, text):
-    norm = " ".join(text.split()).lower()
-
-    d = {"q": text, "target": "fr", "format": "text"}
-    for retry in range(2):
-      token = await self.oauth2.get()
-      req = tornado.httpclient.HTTPRequest(
-        "https://translation.googleapis.com/language/translate/v2",
-        method="POST",
-        body=json.dumps(d),
-        headers={"Authorization": token,
-                 "Content-Type": "application/json; charset=utf-8"})
-      response = await self.client.fetch(req, raise_error=False)
-      if response.code == 401:
-        # oauth token expired; fetch a new one and try again
-        self.oauth2.invalidate()
-        continue
-      elif response.code == 200:
-        # success
-        break
+    out = []
+    for i, w in enumerate(re.split(r"([^\w']+)", text)):
+      if not w: continue
+      if i % 2 == 0:
+        if self.english.check(w):
+          out.append(w.lower())
+        else:
+          out.append("*" * len(w))
       else:
-        print(f"translate failed: {response}\n{response.body}")
-        return ""
+        out.append(w)
 
-    j = json.loads(response.body)
-    print(j)
-    try:
-      return j["data"]["translations"][0]["translatedText"]
-    except (KeyError, IndexError):
-      print("failed to read result")
-      print(j)
-      return ""
+    if out:
+      norm = "".join(out).strip()
+
+      d = {"q": norm, "target": "fr", "format": "text"}
+      for retry in range(2):
+        token = await self.oauth2.get()
+        req = tornado.httpclient.HTTPRequest(
+          "https://translation.googleapis.com/language/translate/v2",
+          method="POST",
+          body=json.dumps(d),
+          headers={"Authorization": token,
+                   "Content-Type": "application/json; charset=utf-8"})
+        response = await self.client.fetch(req, raise_error=False)
+        if response.code == 401:
+          # oauth token expired; fetch a new one and try again
+          self.oauth2.invalidate()
+          continue
+        elif response.code == 200:
+          # success
+          break
+        else:
+          print(f"translate failed: {response}\n{response.body}")
+          return ""
+
+      j = json.loads(response.body)
+      try:
+        return j["data"]["translations"][0]["translatedText"]
+      except (KeyError, IndexError):
+        print("failed to read result")
+        print(j)
+
+    return ""
 
   def use_declaration(self, text):
     print("-------------------------")
@@ -115,7 +127,7 @@ class TextTransform:
         if self.english.check(w):
           return w[::-1]
         else:
-          return w
+          return "*" * len(w)
       return re.sub(r"\w+", flip, text)
     else:
       return text
@@ -228,7 +240,9 @@ class GameState:
       self.sessions[session][1].add(wid)
 
   async def run_game(self):
-    await asyncio.sleep(3.0)
+    self.current_clue = None
+
+    await asyncio.sleep(10.0)
 
     await self.mayor_say("Settle down, you varmints! I’m callin’ this here "
                          "town hall meeting to order!! I’m yer mayor, and let "
@@ -259,7 +273,8 @@ class GameState:
         if c.answer in self.solved:
           await self.mayor_say(c.response)
         else:
-          await self.mayor_say("All right, we'll come back to that one later.")
+          if len(self.solved) < len(r.clues)-1:
+            await self.mayor_say("All right, we'll come back to that one later.")
 
         await asyncio.sleep(3.0)
 
@@ -269,7 +284,7 @@ class GameState:
   async def try_answer(self, text):
     canonical = " ".join(re.findall(r"\w+", text.upper()))
     async with self.cond:
-      if canonical == self.current_clue.answer:
+      if self.current_clue and canonical == self.current_clue.answer:
         self.solved.add(canonical)
         self.cond.notify_all()
 
@@ -279,6 +294,8 @@ class GameState:
 
   async def send_chat(self, session, text):
     speaker, wids = self.sessions.get(session, (None, None))
+
+    print(f"speaker {speaker} wids {wids} says [{text}]")
 
     if self.options.debug:
       if text.startswith("1:"):
