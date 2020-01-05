@@ -43,7 +43,7 @@ class TextTransform:
 
     with open(text_file) as f:
       text = f.read()
-      for w in re.finditer(r"(?:\w+(?:-\w+)?)", text):
+      for w in re.finditer(r"(?:[\w']+(?:-[\w']+)?)", text):
         self.declaration_index.append(w.group(0).lower())
         if self.declaration_index[-1] in ("friends", "with", "benefits"):
           print(len(self.declaration_index)-1, self.declaration_index[-1])
