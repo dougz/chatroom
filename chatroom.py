@@ -63,7 +63,7 @@ class TextTransform:
     if out:
       norm = "".join(out).strip()
 
-      d = {"q": norm, "target": "fr", "format": "text"}
+      d = {"q": norm, "target": "fr", "format": "text", "source": "en"}
       for retry in range(2):
         token = await self.oauth2.get()
         req = tornado.httpclient.HTTPRequest(
@@ -86,7 +86,9 @@ class TextTransform:
 
       j = json.loads(response.body)
       try:
-        return j["data"]["translations"][0]["translatedText"]
+        result = j["data"]["translations"][0]["translatedText"]
+        print(f"google: [{norm}] --> [{result}]")
+        return result
       except (KeyError, IndexError):
         print("failed to read result")
         print(j)
@@ -296,6 +298,7 @@ class GameState:
     speaker, wids = self.sessions.get(session, (None, None))
 
     print(f"speaker {speaker} wids {wids} says [{text}]")
+    text = text.lower()
 
     if self.options.debug:
       if text.startswith("1:"):
