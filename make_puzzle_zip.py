@@ -30,6 +30,10 @@ with zipfile.ZipFile("town_hall_meeting.zip", mode="w") as z:
     with open("solution.html", "rb") as f_in:
       f_out.write(f_in.read())
 
+  with z.open("static_puzzle.html", "w") as f_out:
+    with open("static_puzzle.html", "rb") as f_in:
+      f_out.write(f_in.read())
+
   with z.open("metadata.yaml", "w") as f_out:
     with open("metadata.yaml", "rb") as f_in:
       f_out.write(f_in.read())
