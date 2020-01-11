@@ -251,6 +251,7 @@ class GameState:
                          "me tell you, I have never seen a town hall this full "
                          "of chitter-chatter. I can barely hear what anyone’s "
                          "sayin!")
+    await asyncio.sleep(2.0)
 
     for r in self.rounds:
       self.solved = set()
@@ -272,13 +273,13 @@ class GameState:
             except asyncio.TimeoutError:
               pass
 
+        self.current_clue = None
         if c.answer in self.solved:
           await self.mayor_say(c.response)
         else:
           if len(self.solved) < len(r.clues)-1:
             await self.mayor_say("All right, we'll come back to that one later.")
-
-        await asyncio.sleep(3.0)
+            await asyncio.sleep(3.0)
 
     await self.mayor_say("Thanks for participating in tonight’s debate. As your "
                          "participation prize, have some toy BAZOOKAS.")
