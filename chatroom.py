@@ -408,7 +408,7 @@ def make_app(options):
          "PATIENT is correct!"),
     Clue("Miss Jenkins over at the General Store got a shipment of ladies "
          "underthings last month, but they are not flying off the shelves the "
-         "way she had hoped.  She’s trying to clear inventory, so what we would "
+         "way she had hoped.  She’s trying to clear inventory, so what would we "
          "call what she is running now? [4 4]",
          "BRAS SALE",
          "Yeah, I guess we could say she was running a BRAS SALE. Correct!"),
